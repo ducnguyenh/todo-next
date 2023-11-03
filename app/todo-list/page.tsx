@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from "react";
-import TodoForm from "@/app/todo-list/TodoForm";
+import AddTodo from "@/app/todo-list/AddTodo";
+import EditTodo from "@/app/todo-list/EditTodo";
 
 interface ITodo {
   id: string,
@@ -12,7 +13,7 @@ export default function TodoList() {
   const [todoList, setTodoList] = useState<ITodo[]>([]);
   const [editTodo, setEditTodo] = useState<ITodo>({id: '', value: ''})
 
-  const addTodo = (value: string) => {
+  const handleAddTodo = (value: string) => {
     const newTodo = {
       id: Math.random().toString(),
       value: value
@@ -21,21 +22,19 @@ export default function TodoList() {
     setTodoList([...todoList, newTodo]);
   }
 
-  const onDelete = (id: string) => {
+  const handleDeleteTodo = (id: string) => {
     const newTodoList = todoList.filter(el => el.id !== id);
     setTodoList(newTodoList);
   };
 
-  const onEditTodo = (e) => {
-    e.preventDefault();
-    todoList.forEach(el => {
-      if (el.id === editTodo.id) {
-        el.value = editTodo.value;
-        setEditTodo({id: '', value: ''})
+  const handleEditTodo = (data: ITodo) => {
+    todoList.map(el => {
+      if (el.id === data.id) {
+        el.value = data.value;
       }
     });
+
     setTodoList([...todoList]);
-    console.log('value', todoList, editTodo);
   }
 
   return (
@@ -43,26 +42,17 @@ export default function TodoList() {
         <div className="w-full">
           <h1 className="text-2xl mb-3">To do list</h1>
           <div className="flex justify-between">
-            <TodoForm addTodo={addTodo} />
-            <form onSubmit={onEditTodo}>
-              <input
-                  className="px-2 py-1"
-                  type="text"
-                  value={editTodo.value}
-                  onChange={(e) => setEditTodo({id: editTodo.id, value: e.target.value})}
-                  placeholder="Edit a todo"
-              />
-              <button className="bg-blue-400 px-3 py-1" type="submit">Edit</button>
-            </form>
+            <AddTodo addTodo={handleAddTodo} />
+            <EditTodo emitTodo={handleEditTodo} inputData={editTodo} />
           </div>
           <div className="mt-5">
-            {todoList.map((el, i) => {
+            {todoList.map((el) => {
               return (
                   <div className="bg-white pl-3 flex items-center justify-between mb-1" key={el.id}>
                     <span>{el.value}</span>
                     <span>
                       <button className='bg-blue-400 p-2' type="button" onClick={() => setEditTodo({id: el.id, value: el.value})}>Edit</button>
-                      <button className='ml-2 bg-red-400 p-2' type="button" onClick={() => onDelete(el.id)}>Delete</button>
+                      <button className='ml-2 bg-red-400 p-2' type="button" onClick={() => handleDeleteTodo(el.id)}>Delete</button>
                     </span>
                   </div>
               )
